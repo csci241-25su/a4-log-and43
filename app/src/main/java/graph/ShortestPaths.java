@@ -30,10 +30,20 @@ public class ShortestPaths {
      * Precondition: origin is a node in the Graph.*/
     public void compute(Node origin) {
         paths = new HashMap<Node,PathData>();
-
-        // TODO 1: implement Dijkstra's algorithm to fill paths with
-        // shortest-path data for each Node reachable from origin.
-
+        Heap frontier = new Heap();
+        frontier.add(origin, 0.0);
+        origin.distance = 0.0;
+        origin.previous = null;
+        while(frontier.size() >= 1) {
+           Node f = (Node) frontier.poll();
+           for(String w: f.getNeighbors().keySet()) {
+            if(frontier.get(w) == null || paths.get(w) == null) {
+               getNode(w).distance = f.distance +
+               getNode(w).previous = f;
+               frontier.add(getNode(w), getNode(w).distance); 
+            }
+           }
+        }
     }
 
     /** Returns the length of the shortest path from the origin to destination.
