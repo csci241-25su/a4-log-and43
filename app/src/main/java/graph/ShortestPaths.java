@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.Collections;
 
 /** Provides an implementation of Dijkstra's single-source shortest paths
  * algorithm.
@@ -29,20 +30,27 @@ public class ShortestPaths {
      * backpointer to the previous node on the shortest path.
      * Precondition: origin is a node in the Graph.*/
     public void compute(Node origin) {
+
         paths = new HashMap<Node,PathData>();
         Heap frontier = new Heap();
+        PathData originPath = new PathData(0.0, null);
+        paths.put(origin, originPath);
         frontier.add(origin, 0.0);
-        origin.distance = 0.0;
-        origin.previous = null;
-        while(frontier.size() >= 1) {
-           Node f = (Node) frontier.poll();
-           for(String w: f.getNeighbors().keySet()) {
-            if(frontier.get(w) == null || paths.get(w) == null) {
-               getNode(w).distance = f.distance +
-               getNode(w).previous = f;
-               frontier.add(getNode(w), getNode(w).distance); 
+
+        while (frontier.size() >= 1) {
+            Node f = (Node) frontier.poll();
+            for (Node w: f.getNeighbors().keySet()) {
+                if (paths.get(w) == null) {
+                    PathData wPath = new PathData(paths.get(f).distance + f.getNeighbors().get(w), f);
+                    paths.put(w, wPath);
+                    frontier.add(w, wPath.distance);
+                }
+                else if (paths.get(f).distance + f.getNeighbors().get(w) < paths.get(w).distance) {
+                    frontier.changePriority(w, paths.get(f).distance + f.getNeighbors().get(w));
+                    PathData wPath = new PathData(paths.get(f).distance + f.getNeighbors().get(w), f);
+                    paths.put(w, wPath);
+                }
             }
-           }
         }
     }
 
@@ -51,9 +59,12 @@ public class ShortestPaths {
      * Precondition: destination is a node in the graph, and compute(origin)
      * has been called. */
     public double shortestPathLength(Node destination) {
-        // TODO 2 - implement this method to fetch the shortest path length
-        // from the paths data computed by Dijkstra's algorithm.
-        throw new UnsupportedOperationException();
+        if(paths.get(destination) == null) {
+            return Double.POSITIVE_INFINITY;
+        }
+        else {
+            return paths.get(destination).distance;
+        }
     }
 
     /** Returns a LinkedList of the nodes along the shortest path from origin
@@ -63,10 +74,19 @@ public class ShortestPaths {
      * Precondition: destination is a node in the graph, and compute(origin)
      * has been called. */
     public LinkedList<Node> shortestPath(Node destination) {
-        // TODO 3 - implement this method to reconstruct sequence of Nodes
-        // along the shortest path from the origin to destination using the
-        // paths data computed by Dijkstra's algorithm.
-        throw new UnsupportedOperationException();
+        if(paths.get(destination) == null) {
+            return null;
+        }
+        else {
+            LinkedList<Node> list = new LinkedList<>();
+            Node current = destination;
+            while(paths.get(current) != null) {
+                list.add(current);
+                current = paths.get(current).previous;
+            }
+            Collections.reverse(list);
+            return list;
+        }
     }
 
 
