@@ -151,17 +151,27 @@ public class ShortestPaths {
       }
       graph.report();
 
+      ShortestPaths sp = new ShortestPaths();
+      Node origin = graph.getNode(origCode);
+      sp.compute(origin);
 
-      // TODO 4: create a ShortestPaths object, use it to compute shortest
-      // paths data from the origin node given by origCode.
-
-      // TODO 5:
-      // If destCode was not given, print each reachable node followed by the
-      // length of the shortest path to it from the origin.
-
-      // TODO 6:
-      // If destCode was given, print the nodes in the path from
-      // origCode to destCode, followed by the total path length
-      // If no path exists, print a message saying so.
+      if(destCode == null) {
+        for(Node node: sp.paths.keySet()) {
+            System.out.println(node.getId() + ": " + sp.paths.get(node).distance);
+        }
+      }
+      else {
+        Node destination = graph.getNode(destCode);
+        LinkedList<Node> pathList = sp.shortestPath(destination);
+        if(pathList == null) {
+            System.out.println("No path exists");
+        }
+        for(Node node: pathList) {
+            System.out.print(node.getId() + " ");
+        }
+        if(pathList != null) {
+            System.out.println(sp.shortestPathLength(destination));
+        }
+      }
     }
 }
