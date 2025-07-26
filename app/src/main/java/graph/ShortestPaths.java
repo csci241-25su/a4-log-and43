@@ -36,9 +36,10 @@ public class ShortestPaths {
         PathData originPath = new PathData(0.0, null);
         paths.put(origin, originPath);
         frontier.add(origin, 0.0);
-
+        //Variable names are largely the same as the pseudocode, should make for easier reading
         while (frontier.size() >= 1) {
             Node f = (Node) frontier.poll();
+            //"paths.get(f).distance + f.getNeighbors().get(w)" comes up a lot here, which is f.d + weight(f, w)
             for (Node w: f.getNeighbors().keySet()) {
                 if (paths.get(w) == null) {
                     PathData wPath = new PathData(paths.get(f).distance + f.getNeighbors().get(w), f);
@@ -46,6 +47,7 @@ public class ShortestPaths {
                     frontier.add(w, wPath.distance);
                 }
                 else if (paths.get(f).distance + f.getNeighbors().get(w) < paths.get(w).distance) {
+                    //Change place in heap instead of adding
                     frontier.changePriority(w, paths.get(f).distance + f.getNeighbors().get(w));
                     PathData wPath = new PathData(paths.get(f).distance + f.getNeighbors().get(w), f);
                     paths.put(w, wPath);
@@ -80,6 +82,7 @@ public class ShortestPaths {
         else {
             LinkedList<Node> list = new LinkedList<>();
             Node current = destination;
+            //Invariant: list contains all nodes from destination to current
             while(paths.get(current) != null) {
                 list.add(current);
                 current = paths.get(current).previous;
